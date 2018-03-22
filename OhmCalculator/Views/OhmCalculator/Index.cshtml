@@ -1,0 +1,115 @@
+﻿@model IEnumerable<OhmCalculator.Models.Band>
+
+@{
+    ViewBag.Title = "Index";
+    List<SelectListItem> listItems = new List<SelectListItem>();
+    foreach (var item in Model)
+    {
+        listItems.Add(new SelectListItem() { Text = item.Color, Value = item.Color });
+    }
+
+}
+
+<h2>Choose Bands</h2>
+
+@*<p>
+    @Html.ActionLink("Create New", "Create")
+</p>*@
+<br />
+<div style="display:inline-block">
+    @Html.DropDownList("BandA", listItems,"BandA", new { @class = "form-control" })
+</div>
+<div style="display:inline-block">
+    @Html.DropDownList("BandB", listItems, "BandB", new { @class = "form-control" })
+</div>
+<div style="display:inline-block">
+    @Html.DropDownList("BandC", listItems, "BandC", new { @class = "form-control" })
+</div>
+<div style="display:inline-block">
+    @Html.DropDownList("BandD", listItems, "BandD", new { @class = "form-control" })
+</div>
+<br />
+<br />
+<p style="position:center">
+    <div style="display:inline-block">
+        <button id="submit">Calculate</button>
+        <label id="ohmValue"></label>
+    </div>
+</p>
+@section Scripts{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#submit').click(function (e) {
+                var BandAColor = $('#BandA').val();
+                var BandBColor = $('#BandB').val();
+                var BandCColor = $('#BandC').val();
+                var BandDColor = $('#BandD').val();
+
+                var data = JSON.stringify({
+                    'BandA': BandAColor,
+                    'BandB': BandBColor
+                });
+
+                $.ajax({
+                    type: "GET",
+                    url: "/OhmCalculator/Calculate/?BandA=" + BandAColor + "&BandB=" + BandBColor + "&BandC=" + BandCColor + "&BandD=" + BandDColor +"",
+                    data: data,
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (response) {
+                        alert("MinValue: " + response.minValue + " MaxValue:" + response.maxValue);
+                        $('#ohmValue').text("MinValue: " + response.minValue + " MaxValue:" + response.maxValue)
+                    },
+                    failure: function (response) {
+                        alert(response.responseText);
+                    },
+                    error: function (response) {
+                        alert(response.responseText);
+                    }
+                });
+            });
+            
+            
+        });
+    </script>
+    }
+@*<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Color)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.SignificantFigure)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Multiplier)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Tolerance)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Color)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.SignificantFigure)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Multiplier)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Tolerance)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
+            @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
+            @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
+        </td>
+    </tr>
+}
+
+</table>*@
