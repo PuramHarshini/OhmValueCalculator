@@ -1,35 +1,43 @@
 ﻿using OhmCalculator.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 
 namespace OhmCalculator.Controllers
 {
     public class OhmCalculatorController : Controller
     {
-        private IBandEntities bandEntities;
+        private IOhmValueCalculator bandEntities;
+
         public OhmCalculatorController()
         {
-            bandEntities = new BandEntities();
+            bandEntities = new OhmValueCalculator();            
         }
-        // GET: OhmCalculator
+
+        /// <summary>
+        /// Get the list of band colors
+        /// </summary>
+        /// <returns>Populates the view</returns>
         public ActionResult Index()
         {
             return View(bandEntities.GetBands());
         }
 
+        /// <summary>
+        /// Calulate the resistance value based on band selected band colors
+        /// </summary>
+        /// <param name="BandA"></param>
+        /// <param name="BandB"></param>
+        /// <param name="BandC"></param>
+        /// <param name="BandD"></param>
+        /// <returns>Returns a Json result to populate on the view</returns>
         public JsonResult Calculate(string BandA, string BandB, string BandC, string BandD)
         {
-            //Calculate OhmValue here
-            var ohmValue = ((bandEntities.GetSignificantFigureByColor(BandA) * 10) + (bandEntities.GetSignificantFigureByColor(BandB))) * (bandEntities.GetMultiPlierByColor(BandC));
-            var tolerance = bandEntities.GetToleranceByColor(BandD);
-                       
-            var maxValue = ohmValue + (ohmValue * tolerance)/100;
-            var minValue = ohmValue - (ohmValue * tolerance)/100;
-            return Json(new { maxValue = maxValue, minValue= minValue }, JsonRequestBehavior.AllowGet);
+            //Calculate OhmValue here              
+            var ohmValueRange = bandEntities.CalculateOhmValue(BandA, BandB, BandC, BandD);
 
+            //return OhmValue as range
+            return Json(new { maxValue = ohmValueRange["maxValue"].ToString(),
+                              minValue = ohmValueRange["minValue"].ToString()
+                            }, JsonRequestBehavior.AllowGet);
         }
     }
 }

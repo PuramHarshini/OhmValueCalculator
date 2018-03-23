@@ -7,35 +7,43 @@
     {
         listItems.Add(new SelectListItem() { Text = item.Color, Value = item.Color });
     }
-
 }
 
-<h2>Choose Bands</h2>
+<div id="bands-container">
+    <h2 style="text-align: center;">Choose Bands</h2>
 
-@*<p>
-    @Html.ActionLink("Create New", "Create")
-</p>*@
-<br />
-<div style="display:inline-block">
-    @Html.DropDownList("BandA", listItems,"BandA", new { @class = "form-control" })
-</div>
-<div style="display:inline-block">
-    @Html.DropDownList("BandB", listItems, "BandB", new { @class = "form-control" })
-</div>
-<div style="display:inline-block">
-    @Html.DropDownList("BandC", listItems, "BandC", new { @class = "form-control" })
-</div>
-<div style="display:inline-block">
-    @Html.DropDownList("BandD", listItems, "BandD", new { @class = "form-control" })
-</div>
-<br />
-<br />
-<p style="position:center">
+    <br />
     <div style="display:inline-block">
-        <button id="submit">Calculate</button>
-        <label id="ohmValue"></label>
+        @Html.DropDownList("BandA", listItems, "BandA", new { @class = "form-control" })
     </div>
-</p>
+
+    <div style="display:inline-block">
+        @Html.DropDownList("BandB", listItems, "BandB", new { @class = "form-control" })
+    </div>
+
+    <div style="display:inline-block">
+        @Html.DropDownList("BandC", listItems, "BandC", new { @class = "form-control" })
+    </div>
+
+    <div style="display:inline-block">
+        @Html.DropDownList("BandD", listItems, "BandD", new { @class = "form-control" })
+    </div>
+    <br />
+
+    @*<p style="position:center">*@
+    <div style="display:inline-block; padding-top:10px;">
+        <button id="submit">Calculate</button>
+        <br />
+
+        <label style="padding-top:20px; font-size:12px;" id="ohmMinValue"></label>
+        <br />
+        <label style="padding-top:10px; font-size:12px;" id="ohmMaxValue"></label>
+    </div>
+    @*</p>*@
+</div>
+<br />
+<br />
+
 @section Scripts{
     <script type="text/javascript">
         $(document).ready(function () {
@@ -45,71 +53,71 @@
                 var BandCColor = $('#BandC').val();
                 var BandDColor = $('#BandD').val();
 
-                var data = JSON.stringify({
-                    'BandA': BandAColor,
-                    'BandB': BandBColor
-                });
+                $('#ohmMinValue').text("");
+                $('#ohmMaxValue').text("");
 
                 $.ajax({
                     type: "GET",
-                    url: "/OhmCalculator/Calculate/?BandA=" + BandAColor + "&BandB=" + BandBColor + "&BandC=" + BandCColor + "&BandD=" + BandDColor +"",
-                    data: data,
+                    url: "/OhmCalculator/Calculate/?BandA=" + BandAColor + "&BandB=" + BandBColor + "&BandC=" + BandCColor + "&BandD=" + BandDColor + "",
+                    data: null,
                     contentType: "application/json; charset=utf-8",
                     dataType: "json",
                     success: function (response) {
-                        alert("MinValue: " + response.minValue + " MaxValue:" + response.maxValue);
-                        $('#ohmValue').text("MinValue: " + response.minValue + " MaxValue:" + response.maxValue)
+                        //alert("MinValue: " + response.minValue + " MaxValue:" + response.maxValue);
+                        //$('#ohmValue').text("MinValue: " + response.minValue + " MaxValue:" + response.maxValue)
+                        $('#ohmMinValue').text("Minimum Resistance: " + response.minValue + " Ohms")
+                        $('#ohmMaxValue').text("Maximum Resistance: " + response.maxValue + " Ohms")
                     },
                     failure: function (response) {
-                        alert(response.responseText);
+                        alert('failed');
                     },
                     error: function (response) {
-                        alert(response.responseText);
+                        alert('error occured');
                     }
                 });
             });
-            
-            
+
+            $('#BandA').change(function () {                
+                var Id = $(this).children(':selected').attr('value');                
+                if (Id == "") $("#BandA").css('background-color', "None");                               
+                $("#BandA").css('background-color', Id);
+            });
+
+            $('#BandB').change(function () {
+                var Id = $(this).children(':selected').attr('value');
+                if (Id == "") $("#BandB").css('background-color', "None");
+                $("#BandB").css('background-color', Id);
+            });
+
+            $('#BandC').change(function () {
+                var Id = $(this).children(':selected').attr('value');
+                if (Id == "") $("#BandC").css('background-color', "None");
+                $("#BandC").css('background-color', Id);
+            });
+
+            $('#BandD').change(function () {
+                var Id = $(this).children(':selected').attr('value');
+                if (Id == "") $("#BandD").css('background-color', "None");
+                $("#BandD").css('background-color', Id);
+            });
         });
     </script>
-    }
-@*<table class="table">
-    <tr>
-        <th>
-            @Html.DisplayNameFor(model => model.Color)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.SignificantFigure)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Multiplier)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Tolerance)
-        </th>
-        <th></th>
-    </tr>
+}
+@section Styles
+{
+    <style>
+        #bands-container {
+            width: 80%;
+            height: 100%;
+            border: 1px solid none; /** for viewing purposes **/
+            text-align: center; /** center the divs **/
+            font-size: 12px; /** remove the unwanted space caused by display: inline-block in .child **/
+        }
 
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.Color)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.SignificantFigure)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Multiplier)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Tolerance)
-        </td>
-        <td>
-            @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
-            @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
-            @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
-        </td>
-    </tr>
+        #submit {
+            height: 30px;
+            width: 120px;
+        }
+    </style>
 }
 
-</table>*@
